@@ -1,0 +1,123 @@
+{
+  "name": "RSS Feed → Social Media Auto Post",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "feedUrl": "https://feeds.bbci.co.uk/news/technology/rss.xml"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        0
+      ],
+      "id": "306a96b8-0afe-4d0a-9cad-9a305085051d",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a passionate tech enthusiast who loves sharing \nexciting news with your audience on Telegram.\n\nYou write like a real person — not a robot.\nYou get genuinely excited about good stories.\nYou use casual but professional language.\nYou share your opinion sometimes.\nYou make people feel like they are hearing from a friend \nwho just discovered something amazing.\n\nRules:\n- Write in first person sometimes. \"I just read this and...\" \n- Use natural conversational tone\n- Add genuine reaction to the news\n- Use emojis naturally, not excessively\n- Maximum 200 words\n- Add 3 relevant hashtags at the end\n- End with a question to engage followers\n- Never sound like an AI wrote it\n- No bullet points. Write in natural paragraphs.\n- Vary your sentence length for natural flow"
+            },
+            {
+              "content": "=Write a Telegram post about this news article.\nReact to it naturally like you just read it yourself.\n\nTitle: {{ $json.title }}\nSummary: {{ $json.contentSnippet }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "fef60979-1efe-405e-b5fd-5fe55ef7d3b4",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qkmcSIWhxRW61AM1",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "@technewsautonew",
+        "text": "={{ $json.output[0].content[0].text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "1e058c35-699d-469f-b540-55e82aa501db",
+      "name": "Send a text message",
+      "webhookId": "2f6e8142-5245-4070-87f6-e613d2e91c8a",
+      "credentials": {
+        "telegramApi": {
+          "id": "19DpXXJEF3bJEzAy",
+          "name": "Telegram account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "066c1766-72c0-4a8a-91b9-18c4c6ccf81f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f2f23a593b5262fad10e7ebf366e5500ddfd99f99fc69ff6bdb831511c19c666"
+  },
+  "id": "HzwJSLL7k0TIh2jP",
+  "tags": []
+}
